@@ -71,7 +71,7 @@ export function CycleProvider({ children }) {
         const today = new Date();
         const s = loadFromStorage(STORAGE_KEYS.settings, { start_date: null, cycle_length: 28 });
         const cycleInfo = s.start_date ? getCycleInfo(today, s.start_date, s.cycle_length) : null;
-        const reading = getDailyReading(today, cycleInfo);
+        const todayStr = today.toISOString().split("T")[0]; const storedLogs = loadFromStorage(STORAGE_KEYS.logs, {}); const symptoms = (storedLogs[todayStr]?.symptoms) || []; const reading = getDailyReading(today, cycleInfo, symptoms);
         setDailyReading(reading);
         saveToStorage(STORAGE_KEYS.reading, reading);
       } catch (e) {

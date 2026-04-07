@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getRecommendations } from '../../utils/recommendations';
 import { getPhaseColor } from '../../utils/cycleUtils';
+import EnergyArc from '../EnergyArc';
 
 function StarRating({ stars, color }) {
   return (
@@ -98,6 +99,9 @@ export default function RecommendationsTab({ cycleInfo, dayPatterns }) {
           <span className="text-white/40"> · {dayPatterns.length} personal adjustment{dayPatterns.length > 1 ? 's' : ''} applied</span>
         )}
       </div>
+
+      {/* Week ahead energy arc */}
+      <EnergyArc />
 
       {sections.map(({ key, ...s }) => (
         <ExpandableSection key={key} color={color} {...s} />

@@ -65,21 +65,28 @@ function Layout() {
 
       {/* Daily Reading */}
       {dailyReading && (
-        <div className="border-b border-cosmic-border px-6 py-4 bg-gradient-to-r from-cosmic-card/50 to-transparent">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-xs text-white/40 uppercase tracking-widest mb-1.5">Today's Reading</div>
-            <div className="space-y-2">
+        <div className="border-b border-cosmic-border px-6 py-3 bg-gradient-to-r from-cosmic-card/60 to-transparent">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-[10px] text-white/30 uppercase tracking-widest mb-1">
+              {dailyReading.moonEmoji} {dailyReading.moonPhase} &nbsp;·&nbsp; Today's Reading
+            </div>
+            <div className="flex flex-col sm:flex-row gap-1 sm:gap-4">
               {dailyReading.lunar && (
-                <div className="text-sm text-white/80 leading-relaxed">
-                  <span className="text-cosmic-gold font-semibold">Lunar:</span> {dailyReading.lunar}
-                </div>
+                <p className="text-sm text-white/75 leading-relaxed flex-1">
+                  <span className="text-cosmic-gold font-semibold">Lunar: </span>{dailyReading.lunar}
+                </p>
               )}
               {dailyReading.cycle && (
-                <div className="text-sm text-white/80 leading-relaxed">
-                  <span className="text-cosmic-gold font-semibold">Cycle:</span> {dailyReading.cycle}
-                </div>
+                <p className="text-sm text-white/75 leading-relaxed flex-1">
+                  <span className="text-cosmic-gold font-semibold">Cycle: </span>{dailyReading.cycle}
+                </p>
               )}
             </div>
+            {dailyReading.reflection && (
+              <p className="text-xs text-white/40 mt-1.5 italic leading-relaxed border-t border-cosmic-border/40 pt-1.5">
+                ✦ {dailyReading.reflection}
+              </p>
+            )}
           </div>
         </div>
       )}
