@@ -3,11 +3,11 @@ import { formatDate } from '../utils/cycleUtils';
 
 const CycleContext = createContext(null);
 
-// localStorage helpers
 const STORAGE_KEYS = {
   settings: 'moon_settings',
   logs: 'moon_logs',
   events: 'moon_events',
+  patterns: 'moon_patterns',
   reading: 'moon_reading_today',
 };
 
@@ -29,128 +29,148 @@ function saveToStorage(key, value) {
   }
 }
 
+let eventIdCounter = Date.now();
+
 export function CycleProvider({ children }) {
   const [settings, setSettings] = useState(() => loadFromStorage(STORAGE_KEYS.settings, { start_date: null, cycle_length: 28 }));
   const [logs, setLogs] = useState(() => loadFromStorage(STORAGE_KEYS.logs, {}));
   const [events, setEvents] = useState(() => loadFromStorage(STORAGE_KEYS.events, []));
-  const [patterns, setPatterns] = useState([]);
+  const [patterns, setPatterns] = useState(() => loadFromStorage(STORAGE_KEYS.patterns, []));
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
   const [dailyReading, setDailyReading] = useState(() => loadFromStorage(STORAGE_KEYS.reading, null));
   const [loading, setLoading] = useState(true);
 
-  // Sync settings to localStorage
-  useEffect(() => {
-    saveToStorage(STORAGE_KEYS.settings, settings);
-  }, [settings]);
+  useEffect(() => { saveToStorage(STORAGE_KEYS.settings, settings); }, [settings]);
+  useEffect(() => { saveToStorage(STORAGE_KEYS.logs, logs); }, [logs]);
+  useEffect(() => { saveToStorage(STORAGE_KEYS.events, events); }, [events]);
+  useEffect(() => { saveToStorage(STORAGE_KEYS.patterns, patterns); }, [patterns]);
 
-  // Sync logs to localStorage
-  useEffect(() => {
-    saveToStorage(STORAGE_KEYS.logs, logs);
-  }, [logs]);
-
-  // Sync events to localStorage
-  useEffect(() => {
-    saveToStorage(STORAGE_KEYS.events, events);
-  }, [events]);
+  const syncFromAPI = useCallback(async () => {
     try {
-      const res = await fetch('/api/settings');
-      const data = await res.json();
-      if (data.start_date) setSettings(data);
-    } catch (e) { console.error(e); }
+      const [settingsRes, patternsRes] = await Promise.all([
+        fetch('/api/settings'),
+        fetch('/api/insights/patterns'),
+      ]);
+      if (settingsRes.ok) {
+        const data = await settingsRes.json();
+        if (data.start_date) setSettings(data);
+      }
+      if (patternsRes.ok) {
+        const data = await patternsRes.json();
+        if (Array.isArray(data) && data.length > 0) setPatterns(data);
+      }
+    } catch (e) {}
   }, []);
 
-  // Load logs for a date range
+  useEffect(() => {
+    const init = async () => {
+      await syncFromAPI();
+      try {
+        const { getDailyReading } = await import('../utils/dailyReading');
+        const { getCycleInfo } = await import('../utils/cycleUtils');
+        const today = new Date();
+        const s = loadFromStorage(STORAGE_KEYS.settings, { start_date: null, cycle_length: 28 });
+        const cycleInfo = s.start_date ? getCycleInfo(today, s.start_date, s.cycle_length) : null;
+        const reading = getDailyReading(today, cycleInfo);
+        setDailyReading(reading);
+        saveToStorage(STORAGE_KEYS.reading, reading);
+      } catch (e) {
+        console.error('Daily reading error:', e);
+      }
+      setLoading(false);
+    };
+    init();
+  }, []);
+
+  const saveSettings = useCallback(async (newSettings) => {
+    setSettings(newSettings);
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSettings),
+      });
+    } catch (e) {}
+  }, []);
+
+  const saveLog = useCallback(async (date, logData) => {
+    setLogs(prev => ({ ...prev, [date]: { ...prev[date], ...logData, date } }));
+    try {
+      await fetch('/api/logs/' + date, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(logData),
+      });
+    } catch (e) {}
+  }, []);
+
   const loadLogs = useCallback(async (start, end) => {
     try {
-      const res = await fetch(`/api/logs?start=${start}&end=${end}`);
+      const res = await fetch('/api/logs?start=' + start + '&end=' + end);
+      if (!res.ok) return;
       const data = await res.json();
       setLogs(prev => {
         const next = { ...prev };
         data.forEach(log => { next[log.date] = log; });
         return next;
       });
-    } catch (e) { console.error(e); }
+    } catch (e) {}
   }, []);
 
-  const loadEvents = useCallback(async (month) => {
+  const loadEvents = useCallback(async () => {
     try {
-      const url = month ? `/api/events?month=${month}` : '/api/events';
-      const res = await fetch(url);
+      const res = await fetch('/api/events');
+      if (!res.ok) return;
       const data = await res.json();
-      setEvents(data);
-    } catch (e) { console.error(e); }
+      if (Array.isArray(data) && data.length > 0) setEvents(data);
+    } catch (e) {}
+  }, []);
+
+  const saveEvent = useCallback(async (eventData) => {
+    const localEvent = { ...eventData, id: eventIdCounter++ };
+    setEvents(prev => [...prev, localEvent]);
+    try {
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventData),
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        setEvents(prev => prev.map(e => e.id === localEvent.id ? saved : e));
+        return saved;
+      }
+    } catch (e) {}
+    return localEvent;
+  }, []);
+
+  const deleteEvent = useCallback(async (id) => {
+    setEvents(prev => prev.filter(e => e.id !== id));
+    try {
+      await fetch('/api/events/' + id, { method: 'DELETE' });
+    } catch (e) {}
+  }, []);
+
+  const analyzePatterns = useCallback(async () => {
+    try {
+      const res = await fetch('/api/insights/analyze', { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.patterns) setPatterns(data.patterns);
+        return data;
+      }
+    } catch (e) {}
+    return { success: false, message: 'Backend not available. Run the API server locally for AI pattern analysis.' };
   }, []);
 
   const loadPatterns = useCallback(async () => {
     try {
       const res = await fetch('/api/insights/patterns');
-      const data = await res.json();
-      setPatterns(data);
-    } catch (e) { console.error(e); }
-  }, []);
-
-  useEffect(() => {
-    const init = async () => {
-      await Promise.all([loadSettings(), loadPatterns()]);
-      // Load a wide range of logs
-      const start = formatDate(new Date(new Date().getFullYear(), 0, 1));
-      const end = formatDate(new Date(new Date().getFullYear(), 11, 31));
-      await loadLogs(start, end);
-      await loadEvents();
-
-      // Generate daily reading for today
-      const { getDailyReading } = await import('../utils/dailyReading');
-      const { getCycleInfo } = await import('../utils/cycleUtils');
-      const today = new Date();
-      const cycleInfo = settings.start_date ? getCycleInfo(today, settings.start_date, settings.cycle_length) : null;
-      const reading = getDailyReading(today, cycleInfo);
-      setDailyReading(reading);
-      saveToStorage(STORAGE_KEYS.reading, reading);
-
-      setLoading(false);
-    };
-    init();
-  }, [loadSettings, loadLogs, loadEvents, loadPatterns, settings]);
-
-  const saveSettings = useCallback(async (newSettings) => {
-    await fetch('/api/settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newSettings),
-    });
-    setSettings(newSettings);
-  }, []);
-
-  const saveLog = useCallback(async (date, logData) => {
-    await fetch(`/api/logs/${date}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(logData),
-    });
-    setLogs(prev => ({ ...prev, [date]: { ...prev[date], ...logData, date } }));
-  }, []);
-
-  const saveEvent = useCallback(async (eventData) => {
-    const res = await fetch('/api/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(eventData),
-    });
-    const saved = await res.json();
-    setEvents(prev => [...prev, saved]);
-    return saved;
-  }, []);
-
-  const deleteEvent = useCallback(async (id) => {
-    await fetch(`/api/events/${id}`, { method: 'DELETE' });
-    setEvents(prev => prev.filter(e => e.id !== id));
-  }, []);
-
-  const analyzePatterns = useCallback(async () => {
-    const res = await fetch('/api/insights/analyze', { method: 'POST' });
-    const data = await res.json();
-    if (data.patterns) setPatterns(data.patterns);
-    return data;
+      if (res.ok) {
+        const data = await res.json();
+        setPatterns(data);
+      }
+    } catch (e) {}
   }, []);
 
   return (

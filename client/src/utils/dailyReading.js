@@ -1,4 +1,4 @@
-import { getMoonPhaseName } from './moonPhase';
+import { getMoonPhaseName } from './moonPhase.jsx';
 import { getCycleInfo, PHASES } from './cycleUtils';
 
 const LUNAR_READINGS = {

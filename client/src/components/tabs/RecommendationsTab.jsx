@@ -99,8 +99,8 @@ export default function RecommendationsTab({ cycleInfo, dayPatterns }) {
         )}
       </div>
 
-      {sections.map(s => (
-        <ExpandableSection key={s.key} color={color} {...s} />
+      {sections.map(({ key, ...s }) => (
+        <ExpandableSection key={key} color={color} {...s} />
       ))}
 
       {/* Food card */}
