@@ -3,16 +3,55 @@ import { formatDate } from '../utils/cycleUtils';
 
 const CycleContext = createContext(null);
 
+// localStorage helpers
+const STORAGE_KEYS = {
+  settings: 'moon_settings',
+  logs: 'moon_logs',
+  events: 'moon_events',
+  reading: 'moon_reading_today',
+};
+
+function loadFromStorage(key, defaultValue) {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : defaultValue;
+  } catch (e) {
+    console.error(e);
+    return defaultValue;
+  }
+}
+
+function saveToStorage(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 export function CycleProvider({ children }) {
-  const [settings, setSettings] = useState({ start_date: null, cycle_length: 28 });
-  const [logs, setLogs] = useState({});       // keyed by date string
-  const [events, setEvents] = useState([]);
+  const [settings, setSettings] = useState(() => loadFromStorage(STORAGE_KEYS.settings, { start_date: null, cycle_length: 28 }));
+  const [logs, setLogs] = useState(() => loadFromStorage(STORAGE_KEYS.logs, {}));
+  const [events, setEvents] = useState(() => loadFromStorage(STORAGE_KEYS.events, []));
   const [patterns, setPatterns] = useState([]);
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
+  const [dailyReading, setDailyReading] = useState(() => loadFromStorage(STORAGE_KEYS.reading, null));
   const [loading, setLoading] = useState(true);
 
-  // Load settings
-  const loadSettings = useCallback(async () => {
+  // Sync settings to localStorage
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.settings, settings);
+  }, [settings]);
+
+  // Sync logs to localStorage
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.logs, logs);
+  }, [logs]);
+
+  // Sync events to localStorage
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.events, events);
+  }, [events]);
     try {
       const res = await fetch('/api/settings');
       const data = await res.json();
@@ -58,10 +97,20 @@ export function CycleProvider({ children }) {
       const end = formatDate(new Date(new Date().getFullYear(), 11, 31));
       await loadLogs(start, end);
       await loadEvents();
+
+      // Generate daily reading for today
+      const { getDailyReading } = await import('../utils/dailyReading');
+      const { getCycleInfo } = await import('../utils/cycleUtils');
+      const today = new Date();
+      const cycleInfo = settings.start_date ? getCycleInfo(today, settings.start_date, settings.cycle_length) : null;
+      const reading = getDailyReading(today, cycleInfo);
+      setDailyReading(reading);
+      saveToStorage(STORAGE_KEYS.reading, reading);
+
       setLoading(false);
     };
     init();
-  }, [loadSettings, loadLogs, loadEvents, loadPatterns]);
+  }, [loadSettings, loadLogs, loadEvents, loadPatterns, settings]);
 
   const saveSettings = useCallback(async (newSettings) => {
     await fetch('/api/settings', {
@@ -111,6 +160,7 @@ export function CycleProvider({ children }) {
       events, saveEvent, deleteEvent, loadEvents,
       patterns, analyzePatterns, loadPatterns,
       selectedDate, setSelectedDate,
+      dailyReading,
       loading,
     }}>
       {children}

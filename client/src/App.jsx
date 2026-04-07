@@ -7,7 +7,7 @@ import CycleSettings from './components/CycleSettings';
 import WeeklyStrip from './components/WeeklyStrip';
 
 function Layout() {
-  const { loading, settings } = useCycle();
+  const { loading, settings, dailyReading } = useCycle();
 
   if (loading) {
     return (
@@ -62,6 +62,27 @@ function Layout() {
           </NavLink>
         </nav>
       </header>
+
+      {/* Daily Reading */}
+      {dailyReading && (
+        <div className="border-b border-cosmic-border px-6 py-4 bg-gradient-to-r from-cosmic-card/50 to-transparent">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-xs text-white/40 uppercase tracking-widest mb-1.5">Today's Reading</div>
+            <div className="space-y-2">
+              {dailyReading.lunar && (
+                <div className="text-sm text-white/80 leading-relaxed">
+                  <span className="text-cosmic-gold font-semibold">Lunar:</span> {dailyReading.lunar}
+                </div>
+              )}
+              {dailyReading.cycle && (
+                <div className="text-sm text-white/80 leading-relaxed">
+                  <span className="text-cosmic-gold font-semibold">Cycle:</span> {dailyReading.cycle}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Routes>
         <Route
