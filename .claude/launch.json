@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "API Server",
+      "runtimeExecutable": "/Users/laurenuba/.nvm/versions/node/v20.20.2/bin/node",
+      "runtimeArgs": ["index.js"],
+      "port": 3001,
+      "cwd": "server"
+    },
+    {
+      "name": "React Client",
+      "runtimeExecutable": "/Users/laurenuba/.nvm/versions/node/v20.20.2/bin/node",
+      "runtimeArgs": ["/Users/laurenuba/mooncycleapp/client/node_modules/.bin/vite"],
+      "port": 5173,
+      "cwd": "client"
+    }
+  ]
+}

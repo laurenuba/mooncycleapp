@@ -1,0 +1,12 @@
+{
+  "name": "mooncycleapp",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently --names \"API,CLIENT\" --prefix-colors \"magenta,cyan\" \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "build": "npm run build --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
