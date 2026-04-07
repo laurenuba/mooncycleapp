@@ -105,12 +105,10 @@ export default function Calendar() {
                 {format(day, 'd')}
               </span>
 
-              {/* Moon emoji (only show for significant phases) */}
-              {(moonPhase < 0.05 || moonPhase > 0.95 || (moonPhase > 0.46 && moonPhase < 0.54)) && (
-                <div className="text-center text-xs leading-none" title={moonInfo.name}>
-                  {moonInfo.emoji}
-                </div>
-              )}
+              {/* Moon emoji - show all phases */}
+              <div className="text-center text-xs leading-none" title={moonInfo.name}>
+                {moonInfo.emoji}
+              </div>
 
               {/* Cycle day badge */}
               {cycleInfo && (
