@@ -7,20 +7,50 @@ import { useCycle } from '../context/CycleContext';
 import { getPhaseColor, getPhaseForDay, PHASES } from '../utils/cycleUtils';
 
 const SYMPTOM_LABELS = {
-  cramps: 'Cramps',
-  headache: 'Headache',
-  fatigue: 'Fatigue',
-  bloating: 'Bloating',
+  // Physical
+  cramps: 'Cramps / pelvic pain',
+  back_pain: 'Lower back heaviness',
+  headache: 'Headache / migraine',
+  bloating: 'Bloating / fullness',
   breast_tenderness: 'Breast tenderness',
-  mood_swings: 'Mood swings',
-  anxiety: 'Anxiety',
-  insomnia: 'Insomnia',
-  back_pain: 'Back pain',
-  acne: 'Acne',
+  acne: 'Skin flaring',
+  digestive_changes: 'Digestive changes',
+  joint_aches: 'Joint / muscle aches',
+  // Energy & Mind
   low_energy: 'Low energy',
-  high_energy: 'High energy',
+  high_energy: 'Radiant energy',
+  sharp_focus: 'Sharp focus',
+  low_motivation: 'Low motivation',
+  creative_spark: 'Creative spark',
+  brain_fog: 'Brain fog',
+  vivid_dreams: 'Vivid dreams',
+  insomnia: 'Disrupted sleep',
+  // Emotional
+  tender_heart: 'Tender / sensitive heart',
+  mood_swings: 'Emotional waves',
+  anxiety: 'Anxiety / unease',
+  irritability: 'Irritability / sharp edges',
+  deep_calm: 'Deep calm',
+  grief_surfacing: 'Grief surfacing',
+  joy_aliveness: 'Joy / aliveness',
+  need_solitude: 'Craving solitude',
+  // Sensual & Relational
+  desire: 'Desire / arousal',
+  low_libido: 'Low libido',
+  social_hunger: 'Craving connection',
+  magnetism: 'Feeling magnetic',
+  craving_touch: 'Craving touch / held',
+  // Appetite & Cravings
+  craving_sweet: 'Sweet cravings',
+  craving_salt: 'Salt / savoury cravings',
+  craving_warmth: 'Craving warm food',
+  appetite_low: 'Low appetite',
+  appetite_high: 'Increased appetite',
+  // Energy patterns
   low_energy_pattern: 'Low energy (pattern)',
   high_energy_pattern: 'High energy (pattern)',
+  // Legacy keys
+  fatigue: 'Low energy',
 };
 
 function CustomTooltip({ active, payload }) {
@@ -217,7 +247,7 @@ export default function InsightsPage() {
       {/* Top symptoms */}
       {topSymptoms.length > 0 && (
         <div className="card p-5">
-          <h3 className="font-semibold text-white mb-4">Most Logged Symptoms</h3>
+          <h3 className="font-semibold text-white mb-4">Most Logged Body Signals</h3>
           <div className="space-y-2">
             {topSymptoms.map(({ symptom, count }, i) => (
               <div key={i} className="flex items-center gap-3">

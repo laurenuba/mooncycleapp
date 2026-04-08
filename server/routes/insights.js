@@ -128,22 +128,50 @@ Where X is the cycle day number and symptom is the symptom name (use underscores
 
 function defaultInsight({ cycleDay, symptom, occurrences }) {
   const map = {
-    cramps: `You often experience cramps on day ${cycleDay} — a heating pad, gentle yoga, and ginger tea can help ease discomfort.`,
-    fatigue: `Fatigue tends to show up for you on day ${cycleDay}. Consider scheduling lighter tasks and prioritizing rest today.`,
-    headache: `Headaches have appeared on day ${cycleDay} before. Stay well-hydrated and reduce screen time if possible.`,
-    bloating: `Bloating often arrives on day ${cycleDay}. Warm herbal teas and avoiding salty foods may help you feel more comfortable.`,
-    'mood swings': `Emotional sensitivity peaks for you around day ${cycleDay}. Extra self-compassion and grounding rituals go a long way.`,
-    'low energy': `Your energy tends to dip on day ${cycleDay}. This is a great day for gentle tasks and restorative activities.`,
-    'high energy': `Day ${cycleDay} is typically a high-energy day for you — perfect for ambitious plans and creative work!`,
-    acne: `Skin tends to be more reactive on day ${cycleDay}. Anti-inflammatory foods and a gentle skincare routine can help.`,
-    'back pain': `Back tension often appears on day ${cycleDay}. Gentle stretching, a warm bath, and magnesium may provide relief.`,
-    'breast tenderness': `Breast tenderness tends to peak for you around day ${cycleDay}. Reducing caffeine and wearing a supportive bra can help.`,
-    insomnia: `Sleep can be disrupted on day ${cycleDay} based on your patterns. A calming wind-down ritual and magnesium-rich foods may help.`,
-    anxiety: `Anxiety tends to surface for you on day ${cycleDay}. Breathwork, a walk in nature, and gentle movement can ground you.`,
-    low_energy_pattern: `Your energy consistently dips on day ${cycleDay}. Plan lighter tasks and give yourself permission to rest.`,
-    high_energy_pattern: `Day ${cycleDay} is a naturally high-energy day for you — an ideal time for important work and social plans!`,
+    // Physical
+    cramps: `You often experience cramps on day ${cycleDay} — a castor oil pack the night before, ginger tea, and magnesium glycinate can reduce prostaglandin-driven pain over time.`,
+    back_pain: `Lower back heaviness tends to arrive on day ${cycleDay}. Gentle yin yoga, a warm compress, and magnesium may provide relief.`,
+    headache: `Headaches have appeared on day ${cycleDay} before. Stay hydrated, reduce screen time, and consider magnesium supplementation long-term.`,
+    bloating: `Bloating often arrives on day ${cycleDay}. Warm fennel or ginger tea, reducing salt, and gentle abdominal massage can help.`,
+    breast_tenderness: `Breast tenderness tends to peak for you around day ${cycleDay}. Reducing caffeine and evening primrose oil may ease sensitivity over time.`,
+    acne: `Skin tends to flare on day ${cycleDay}. Anti-inflammatory foods, zinc-rich meals, and a gentle skincare routine support your skin from within.`,
+    digestive_changes: `Digestive shifts often appear on day ${cycleDay} — a sign of prostaglandin activity. Warm, cooked foods and probiotics can bring balance.`,
+    joint_aches: `Joint and muscle aches show up for you around day ${cycleDay}. Omega-3-rich foods, turmeric, and gentle movement support inflammation.`,
+    // Energy & Mind
+    low_energy: `Your energy tends to dip on day ${cycleDay}. This is a great day for gentle tasks, restorative yoga, and early sleep.`,
+    high_energy: `Day ${cycleDay} is typically a high-energy day for you — perfect for ambitious plans and creative work!`,
+    sharp_focus: `Mental clarity peaks for you around day ${cycleDay}. Schedule your most cognitively demanding work here.`,
+    low_motivation: `Motivation dips on day ${cycleDay} — this is your body asking for softness, not pushing harder. Rest is productive.`,
+    creative_spark: `Creative energy surges on day ${cycleDay}. Keep a notebook close — ideas that arrive now are worth capturing.`,
+    brain_fog: `Brain fog tends to appear on day ${cycleDay}. Reducing sugar, staying hydrated, and a short walk can clear the clouds.`,
+    vivid_dreams: `Your dream life intensifies on day ${cycleDay}. Consider keeping a dream journal — the unconscious speaks loudly here.`,
+    insomnia: `Sleep can be disrupted on day ${cycleDay}. A calming wind-down ritual, magnesium glycinate, and limiting screens after 9pm can help.`,
+    // Emotional
+    tender_heart: `Emotional sensitivity rises for you on day ${cycleDay}. This tenderness is a superpower — give yourself spaciousness and compassion.`,
+    mood_swings: `Emotional waves tend to move through you around day ${cycleDay}. Grounding rituals, time in nature, and honest connection help.`,
+    anxiety: `Anxiety tends to surface on day ${cycleDay}. Breathwork (especially extended exhale), a walk barefoot outside, and less caffeine can steady you.`,
+    irritability: `A sharper edge appears on day ${cycleDay}. Your body may be pointing to something that needs attention — journal before reacting.`,
+    deep_calm: `Day ${cycleDay} brings a deep settledness for you. Use this spaciousness for reflection, meditation, or meaningful conversation.`,
+    grief_surfacing: `Old feelings sometimes surface around day ${cycleDay}. This is a natural release cycle — let it move through you without judgment.`,
+    joy_aliveness: `A natural aliveness arrives on day ${cycleDay}. Lean into it — say yes to beauty, celebration, and things that light you up.`,
+    need_solitude: `You tend to crave solitude on day ${cycleDay}. Honour this signal — retreat is medicine, not withdrawal.`,
+    // Sensual & Relational
+    desire: `Desire peaks for you on day ${cycleDay} — this is oestrogen and LH at work. A natural, healthy surge of life force energy.`,
+    low_libido: `Libido tends to be quieter on day ${cycleDay}. This is a natural ebb — your body is conserving energy elsewhere.`,
+    social_hunger: `You crave connection on day ${cycleDay}. Oestrogen rising amplifies your magnetism and desire for togetherness.`,
+    magnetism: `You tend to feel especially magnetic on day ${cycleDay}. Trust it — this is your full-bloom ovulatory power.`,
+    craving_touch: `A deep desire for closeness or being held tends to appear on day ${cycleDay}. Ask for what you need — it's not too much.`,
+    // Appetite & Cravings
+    craving_sweet: `Sweet cravings arrive on day ${cycleDay} — often a sign of progesterone rise and blood sugar fluctuations. Root vegetables and dark chocolate can satisfy without the crash.`,
+    craving_salt: `Salt cravings on day ${cycleDay} often signal mineral needs. Mineral-rich broths, seaweed, and whole foods can help.`,
+    craving_warmth: `You tend to want warm, nourishing food on day ${cycleDay}. Soups, stews, and spiced grains are deeply supportive right now.`,
+    appetite_low: `Appetite tends to be lower on day ${cycleDay}. Eat small, nutrient-dense meals and trust your body's quieter hunger signals.`,
+    appetite_high: `Appetite increases on day ${cycleDay} — your body is asking for more fuel. Prioritise protein and healthy fats to stay satiated.`,
+    // Energy patterns
+    low_energy_pattern: `Your energy consistently dips on day ${cycleDay}. Plan lighter tasks and give yourself permission to rest — this is cyclical wisdom.`,
+    high_energy_pattern: `Day ${cycleDay} is a naturally high-energy day for you — an ideal time for important work, social plans, and creative projects!`,
   };
-  return map[symptom] || `You've noticed a recurring pattern on day ${cycleDay} with ${symptom} (${occurrences} occurrences). Listen to your body and adjust your plans accordingly.`;
+  return map[symptom] || `You've noticed a recurring pattern on day ${cycleDay} with ${symptom.replace(/_/g, ' ')} (${occurrences} occurrences). Listen to your body and adjust your plans accordingly.`;
 }
 
 module.exports = router;
